@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "packsync",
+  "version": "1.0-SNAPSHOT",
+  "name": "PackSync",
+  "description": "Proof of concept for distributing resource packs embedded in datapacks over Minecraft's networking protocol.",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "com.lucachinou.packsync.client.PackSyncDataGenerator"
+    ],
+    "client": [
+      "com.lucachinou.packsync.client.PackSyncClient"
+    ],
+    "main": [
+      "com.lucachinou.packsync.PackSync"
+    ]
+  },
+  "mixins": [
+    "packsync.mixins.json",
+    {
+      "config": "packsync.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "fabric-api": "*",
+    "minecraft": "26.3"
+  }
+}
