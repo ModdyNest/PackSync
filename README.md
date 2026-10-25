@@ -14,17 +14,15 @@ The server scans **enabled datapacks** at startup and after each successful `/re
 world/datapacks/my_datapack/
 ├── pack.mcmeta
 ├── data/
-├── ressources.zip       # optional; exact spelling, with two consecutive s characters
-└── ressources.json      # optional
+├── resources.zip       # optional
+└── resources.json      # optional
 ```
 
-The filenames **`ressources.zip`** and **`ressources.json`** remain unchanged. Do not rename them to `resources.zip` or `resources.json`.
-
-`ressources.zip` must be a valid resource pack: its own `pack.mcmeta` and `assets/` directory must be **at the root of the ZIP**, without an enclosing folder. Its metadata must be compatible with Minecraft 26.3.
+`resources.zip` must be a valid resource pack: its own `pack.mcmeta` and `assets/` directory must be **at the root of the ZIP**, without an enclosing folder. Its metadata must be compatible with Minecraft 26.3.
 
 ### Loading priority
 
-Use the optional `ressources.json` file to specify the pack's priority:
+Use the optional `resources.json` file to specify the pack's priority:
 
 ```json
 { "priority": "HIGH" }
@@ -38,7 +36,7 @@ The mod's packs are placed above personal resource packs without saving changes 
 
 ## How it works
 
-1. Immediately after joining in the play phase, the client checks the Fabric channel and requests a catalog of datapacks containing `ressources.zip`.
+1. Immediately after joining in the play phase, the client checks the Fabric channel and requests a catalog of datapacks containing `resources.zip`.
 2. If the channel is absent, the client logs an INFO message and continues normally. If the channel is advertised but the catalog request receives no response, synchronization is skipped after **5 seconds**, with an INFO message.
 3. The server supplies each pack's datapack ID, priority, size, and SHA-256 hash.
 4. Packs are downloaded sequentially in **256 KiB chunks**, with one chunk in flight at a time. The PoC supports up to **128 packs**, with a maximum of **512 MiB per ZIP**.

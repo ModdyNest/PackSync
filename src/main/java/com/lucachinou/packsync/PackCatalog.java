@@ -20,7 +20,7 @@ public final class PackCatalog {
         for (var pack : server.getPackRepository().getSelectedPacks()) {
             if (entries.size() >= Protocol.MAX_PACKS) break;
             try (var resources = pack.openMetadata()) {
-                var zip = resources.getRootResource("ressources.zip");
+                var zip = resources.getRootResource("resources.zip");
                 if (zip == null) continue;
                 Files.createDirectories(cache);
                 Path temp = Files.createTempFile(cache, "scan-", ".tmp");
@@ -32,14 +32,14 @@ public final class PackCatalog {
                         if (check.getEntry("pack.mcmeta") == null) throw new IOException("Missing pack.mcmeta at the root of the ZIP");
                     }
                     Protocol.Priority priority = Protocol.Priority.MEDIUM;
-                    var config = resources.getRootResource("ressources.json");
+                    var config = resources.getRootResource("resources.json");
                     if (config != null) {
                         try (var in = config.get()) {
                             var json = JsonParser.parseString(new String(in.readNBytes(8193), java.nio.charset.StandardCharsets.UTF_8));
                             String value = json.isJsonPrimitive() ? json.getAsString() : json.getAsJsonObject().get("priority").getAsString();
                             priority = Protocol.Priority.valueOf(value);
                         } catch (Exception e) {
-                            PackSync.LOGGER.warn("{}: invalid ressources.json; using MEDIUM priority", pack.getId());
+                            PackSync.LOGGER.warn("{}: invalid resources.json; using MEDIUM priority", pack.getId());
                         }
                     }
                     String hash = hash(temp);

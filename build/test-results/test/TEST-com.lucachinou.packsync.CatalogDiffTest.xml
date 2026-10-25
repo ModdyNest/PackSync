@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.lucachinou.packsync.CatalogDiffTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-24T20:28:11.118Z" hostname="DESKTOP-1ladm8c" time="0.091">
+<testsuite name="com.lucachinou.packsync.CatalogDiffTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-25T11:31:41.165Z" hostname="DESKTOP-1ladm8c" time="0.107">
   <properties/>
-  <testcase name="rejectsDuplicateDatapackIds()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.01"/>
-  <testcase name="includesOnlyAddedModifiedAndRemovedEntries()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.069"/>
-  <testcase name="removesAllPacks()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.001"/>
-  <testcase name="detectsPriorityAndSizeChangesWithoutHashChanges()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.0"/>
+  <testcase name="rejectsDuplicateDatapackIds()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.012"/>
+  <testcase name="includesOnlyAddedModifiedAndRemovedEntries()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.083"/>
+  <testcase name="removesAllPacks()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.0"/>
+  <testcase name="detectsPriorityAndSizeChangesWithoutHashChanges()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.001"/>
   <testcase name="successiveUpdatesCanBeCoalescedDuringDownload()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.001"/>
   <testcase name="unchangedAndReorderedCatalogsProduceNoPacket()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
