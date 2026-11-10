@@ -4,9 +4,9 @@
   "version": "1.0-SNAPSHOT",
   "name": "PackSync",
   "description": "Proof of concept for distributing resource packs embedded in datapacks over Minecraft's networking protocol.",
-  "authors": [],
+  "authors": ["lucachinou"],
   "contact": {},
-  "license": "All-Rights-Reserved",
+  "license": "GNU General Public License v3.0",
   "environment": "*",
   "entrypoints": {
     "fabric-datagen": [

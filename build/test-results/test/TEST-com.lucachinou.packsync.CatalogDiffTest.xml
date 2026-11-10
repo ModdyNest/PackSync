@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.lucachinou.packsync.CatalogDiffTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-25T11:31:41.165Z" hostname="DESKTOP-1ladm8c" time="0.107">
+<testsuite name="com.lucachinou.packsync.CatalogDiffTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T18:47:49.970Z" hostname="MacBook-Air-de-Lucachinou.local" time="0.115">
   <properties/>
-  <testcase name="rejectsDuplicateDatapackIds()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.012"/>
-  <testcase name="includesOnlyAddedModifiedAndRemovedEntries()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.083"/>
-  <testcase name="removesAllPacks()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.0"/>
+  <testcase name="rejectsDuplicateDatapackIds()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.013"/>
+  <testcase name="includesOnlyAddedModifiedAndRemovedEntries()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.086"/>
+  <testcase name="removesAllPacks()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.001"/>
   <testcase name="detectsPriorityAndSizeChangesWithoutHashChanges()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.001"/>
-  <testcase name="successiveUpdatesCanBeCoalescedDuringDownload()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.001"/>
+  <testcase name="successiveUpdatesCanBeCoalescedDuringDownload()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.0"/>
   <testcase name="unchangedAndReorderedCatalogsProduceNoPacket()" classname="com.lucachinou.packsync.CatalogDiffTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

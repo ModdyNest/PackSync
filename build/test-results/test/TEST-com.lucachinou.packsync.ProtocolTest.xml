@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.lucachinou.packsync.ProtocolTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-25T11:31:41.288Z" hostname="DESKTOP-1ladm8c" time="0.234">
+<testsuite name="com.lucachinou.packsync.ProtocolTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T18:47:50.105Z" hostname="MacBook-Air-de-Lucachinou.local" time="0.235">
   <properties/>
-  <testcase name="catalogRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.226"/>
-  <testcase name="rejectsOversizedRemovalList()" classname="com.lucachinou.packsync.ProtocolTest" time="0.0"/>
+  <testcase name="catalogRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.228"/>
+  <testcase name="rejectsOversizedRemovalList()" classname="com.lucachinou.packsync.ProtocolTest" time="0.001"/>
   <testcase name="rejectsOversizedDelta()" classname="com.lucachinou.packsync.ProtocolTest" time="0.0"/>
   <testcase name="deltaRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.001"/>
   <testcase name="chunkRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.004"/>
-  <testcase name="rejectsOversizedCatalog()" classname="com.lucachinou.packsync.ProtocolTest" time="0.001"/>
+  <testcase name="rejectsOversizedCatalog()" classname="com.lucachinou.packsync.ProtocolTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
