@@ -68,12 +68,22 @@ public final class Protocol {
         public boolean isEmpty() { return changed.isEmpty() && removed.isEmpty(); }
         @Override public Type<Delta> type() { return TYPE; }
     }
+    /** Sent only after consent, verified downloads, and the resource reload have completed. */
+    public record Ready() implements CustomPacketPayload {
+        public static final Type<Ready> TYPE = Protocol.type("ready");
+        public static final StreamCodec<FriendlyByteBuf, Ready> CODEC = CustomPacketPayload.codec((p,b) -> { }, b -> new Ready());
+        @Override public Type<Ready> type() { return TYPE; }
+    }
     private static int readCount(FriendlyByteBuf b) {
         int count = b.readVarInt();
         if (count < 0 || count > MAX_PACKS) throw new IllegalArgumentException("Too many packs");
         return count;
     }
     public static void register() {
+        PayloadTypeRegistry.serverboundConfiguration().register(Request.TYPE, Request.CODEC);
+        PayloadTypeRegistry.serverboundConfiguration().register(Ready.TYPE, Ready.CODEC);
+        PayloadTypeRegistry.clientboundConfiguration().register(Catalog.TYPE, Catalog.CODEC);
+        PayloadTypeRegistry.clientboundConfiguration().register(Chunk.TYPE, Chunk.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(Request.TYPE, Request.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(Catalog.TYPE, Catalog.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(Chunk.TYPE, Chunk.CODEC);

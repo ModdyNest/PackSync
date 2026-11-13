@@ -2,6 +2,8 @@ package com.lucachinou.packsync.client;
 
 import com.lucachinou.packsync.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
+import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.repository.*;
@@ -25,15 +27,40 @@ public final class PackDownload {
     private static int index;
     private static long offset, received, total, lastActivity, started;
     private static boolean waiting, busy;
+    private static boolean configuration, configured, prompting, accepted, loading;
+    private static long generation;
+    private static Runnable configurationReady, disconnectAction;
+    private static Consumer<Protocol.Request> send = ClientPlayNetworking::send;
+    private static ServerConsent permissions;
+    private static String serverKey;
     private static DownloadScreen screen;
     private static net.minecraft.client.gui.screens.Screen previous;
     public static void start(Minecraft client) {
+        if (configured) { configuration = false; send = ClientPlayNetworking::send; return; }
+        configuration = false;
         if (!ClientPlayNetworking.canSend(Protocol.Request.TYPE)) {
             PackSync.LOGGER.info("The server does not have PackSync installed; skipping resource synchronization.");
             return;
         }
+        send = ClientPlayNetworking::send;
+        disconnectAction = () -> client.getConnection().getConnection().disconnect(Component.literal("Server resource packs declined"));
         waiting = true; lastActivity = System.nanoTime();
         ClientPlayNetworking.send(new Protocol.Request("", 0));
+    }
+    public static void beginConfiguration(Minecraft client, Runnable disconnect) {
+        disconnect(client);
+        configuration = true; configured = false; accepted = false;
+        disconnectAction = disconnect;
+        send = ClientConfigurationNetworking::send;
+        configurationReady = () -> ClientConfigurationNetworking.send(new Protocol.Ready());
+        permissions = new ServerConsent(client.gameDirectory.toPath().resolve("config/packsync-permissions.json"));
+        var server = client.getCurrentServer();
+        serverKey = server == null ? null : server.ip.trim().toLowerCase(Locale.ROOT);
+    }
+    public static void configurationCatalog(Minecraft client, Protocol.Catalog catalog) {
+        if (!configuration || configured || waiting || busy || prompting || loading) return;
+        waiting = true;
+        catalog(client, catalog);
     }
     public static void catalog(Minecraft client, Protocol.Catalog catalog) {
         if (!waiting || busy) return;
@@ -41,8 +68,29 @@ public final class PackDownload {
         try {
             validate(catalog.entries());
             announced = List.copyOf(catalog.entries());
-            synchronize(client, announced);
+            authorize(client, announced);
         } catch (Exception e) { fail(client,e); }
+    }
+    private static void authorize(Minecraft client, List<Protocol.Entry> catalog) {
+        if (catalog.isEmpty() || accepted || (permissions != null && permissions.allows(serverKey))) {
+            accepted = accepted || !catalog.isEmpty();
+            synchronize(client, catalog);
+            return;
+        }
+        prompting = true;
+        previous = client.gui.screen();
+        long token = generation;
+        client.gui.setScreen(new ConsentScreen(catalog.size(), catalog.stream().mapToLong(Protocol.Entry::size).sum(), remember -> {
+            if (token != generation) return;
+            prompting = false; accepted = true;
+            if (remember && permissions != null) permissions.remember(serverKey);
+            client.gui.setScreen(previous); previous = null;
+            synchronize(client, catalog);
+        }, () -> {
+            if (token != generation) return;
+            prompting = false;
+            disconnectAction.run();
+        }));
     }
     public static void delta(Minecraft client, Protocol.Delta delta) {
         try {
@@ -75,6 +123,7 @@ public final class PackDownload {
             }
             if (entries.isEmpty()) {
                 if (!ACTIVE.isEmpty() || !target.isEmpty()) apply(client);
+                else finishConfiguration();
                 return;
             }
             directory = client.gameDirectory.toPath().resolve(PackSync.CACHE_DIRECTORY);
@@ -94,7 +143,7 @@ public final class PackDownload {
     }
     private static void request() {
         lastActivity = System.nanoTime();
-        ClientPlayNetworking.send(new Protocol.Request(entries.get(index).sha256(),offset));
+        send.accept(new Protocol.Request(entries.get(index).sha256(),offset));
     }
     public static void chunk(Minecraft client, Protocol.Chunk chunk) {
         if (!busy || index >= entries.size()) return;
@@ -122,16 +171,28 @@ public final class PackDownload {
             if (metadata == null) throw new IOException("Invalid pack.mcmeta: " + e.id());
             packs.add(new Pack(location,supplier,metadata,new PackSelectionConfig(false, Pack.Position.TOP,true)));
         }
-        ACTIVE.clear(); ACTIVE.addAll(packs); busy = false;
-        restore(client);
-        client.reloadResourcePacks();
+        ACTIVE.clear(); ACTIVE.addAll(packs); busy = false; loading = true;
+        long token = generation;
+        client.reloadResourcePacks().whenComplete((ignored, error) -> client.execute(() -> {
+            if (generation != token) return;
+            loading = false;
+            if (error != null) { fail(client, new IOException("Failed to load server resources", error)); return; }
+            restore(client);
+            finishConfiguration();
+        }));
         PackSync.LOGGER.info("{} resource packs synchronized and queued for loading", packs.size());
     }
+    private static void finishConfiguration() {
+        if (configuration && !configured) {
+            configured = true;
+            configurationReady.run();
+        }
+    }
     public static void tick(Minecraft client) {
-        if (pending != null && !busy && !waiting && client.getConnection() != null && client.gui.overlay() == null) {
+        if (pending != null && !busy && !waiting && !prompting && !loading && client.getConnection() != null && client.gui.overlay() == null) {
             var update = pending;
             pending = null;
-            synchronize(client,update);
+            authorize(client,update);
         }
         // Initial terrain-loading screens can replace us after JOIN. Only replace those,
         // never a disconnect screen or a server dialog.
@@ -155,7 +216,12 @@ public final class PackDownload {
         screen = null; previous = null;
     }
     private static void fail(Minecraft client, Exception e) {
-        PackSync.LOGGER.warn("Resource synchronization aborted; keeping the connection open",e);
+        PackSync.LOGGER.warn("Resource synchronization failed",e);
+        if (configuration && !configured) {
+            cleanup();
+            disconnectAction.run();
+            return;
+        }
         cleanup(); restore(client);
     }
     private static void cleanup() {
@@ -166,6 +232,7 @@ public final class PackDownload {
         temp = null;
     }
     public static void disconnect(Minecraft client) {
+        generation++; loading = prompting = accepted = configured = configuration = false;
         cleanup(); restore(client);
         announced = target = entries = List.of(); pending = null; downloaded.clear();
         boolean hadPacks = !ACTIVE.isEmpty(); ACTIVE.clear();

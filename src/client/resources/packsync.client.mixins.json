@@ -4,7 +4,8 @@
   "package": "com.lucachinou.packsync.mixin.client",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "PackRepositoryMixin"
+    "PackRepositoryMixin",
+    "ClientCommonPacketListenerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

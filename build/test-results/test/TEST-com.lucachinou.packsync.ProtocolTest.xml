@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <testsuite name="com.lucachinou.packsync.ProtocolTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-11-10T18:47:50.105Z" hostname="MacBook-Air-de-Lucachinou.local" time="0.235">
   <properties/>
   <testcase name="catalogRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.228"/>
   <testcase name="rejectsOversizedRemovalList()" classname="com.lucachinou.packsync.ProtocolTest" time="0.001"/>
   <testcase name="rejectsOversizedDelta()" classname="com.lucachinou.packsync.ProtocolTest" time="0.0"/>
+=======
+<testsuite name="com.lucachinou.packsync.ProtocolTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-13T17:21:23.144Z" hostname="DESKTOP-1ladm8c" time="0.222">
+  <properties/>
+  <testcase name="catalogRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.212"/>
+  <testcase name="configurationReadyRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.001"/>
+  <testcase name="rejectsOversizedRemovalList()" classname="com.lucachinou.packsync.ProtocolTest" time="0.0"/>
+  <testcase name="rejectsOversizedDelta()" classname="com.lucachinou.packsync.ProtocolTest" time="0.001"/>
+>>>>>>> ab6afb3 (Packs are now downloaded in the config phase + New prompt when user join a new server)
   <testcase name="deltaRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.001"/>
   <testcase name="chunkRoundTrip()" classname="com.lucachinou.packsync.ProtocolTest" time="0.004"/>
   <testcase name="rejectsOversizedCatalog()" classname="com.lucachinou.packsync.ProtocolTest" time="0.0"/>

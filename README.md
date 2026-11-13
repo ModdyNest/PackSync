@@ -36,16 +36,16 @@ The mod's packs are placed above personal resource packs without saving changes 
 
 ## How it works
 
-1. Immediately after joining in the play phase, the client checks the Fabric channel and requests a catalog of datapacks containing `resources.zip`.
-2. If the channel is absent, the client logs an INFO message and continues normally. If the channel is advertised but the catalog request receives no response, synchronization is skipped after **5 seconds**, with an INFO message.
+1. During the **configuration phase**, the server adds a PackSync task only for compatible clients and sends a catalog of datapacks containing `resources.zip`. Clients without PackSync are fully accepted without this task.
+2. For a nonempty catalog, the client asks permission with **Install**, **Disconnect**, and a **Remember for this server** checkbox. No ZIP is requested before permission is granted. An empty catalog proceeds immediately without a prompt. Servers without PackSync are skipped with an INFO message.
 3. The server supplies each pack's datapack ID, priority, size, and SHA-256 hash.
 4. Packs are downloaded sequentially in **256 KiB chunks**, with one chunk in flight at a time. The PoC supports up to **128 packs**, with a maximum of **512 MiB per ZIP**.
 5. A download screen displays a green progress bar, overall byte-weighted percentage, current datapack ID, completed/total pack count, downloaded/total MB, and **average MB/s since the download started**. Units are decimal: 1 MB = 1,000,000 bytes, not megabits.
-6. After SHA-256 verification, the packs are activated together and Minecraft reloads its resources. The packs are deactivated on disconnect.
+6. After SHA-256 verification, the packs are activated together and Minecraft reloads its resources. Only after the reload future completes does the client acknowledge the configuration task, allowing world entry. The packs are deactivated on disconnect.
 
-The connection is already established during the download: **this PoC does not delay world entry during the configuration phase**. The screen prevents normal gameplay during the transfer, but the player already exists on the server. Minecraft's standard resource reload overlay appears afterward.
+With this version installed on both sides, **initial consent, download, and resource loading happen before the player enters the world**. Keep-alive traffic continues while the permission prompt is open. Remembered installation permission is stored by server address in `config/packsync-permissions.json`; delete an entry (or the file) while the game is stopped to revoke it. This permission also covers live pack updates during the connection. Remembering is opt-in and saved only when **Install** is selected; it is not proof of the server's identity. Connections without a stable server address are not remembered.
 
-If a chunk receives no response for **30 seconds**, or a download encounters invalid data or a disk error, synchronization is aborted, the partial file is removed, a warning is logged, and the connection is kept open. An empty catalog does not open a download screen.
+If a chunk receives no response for **30 seconds**, or a download encounters invalid data or a disk error, the partial file is removed and a warning is logged. During initial configuration, the client disconnects instead of entering the world without the requested resources. During live updates, the connection is kept open. The permission prompt itself has no download timeout. For compatibility with older PackSync servers, a play-phase fallback remains: those servers cannot provide the before-world-entry guarantee, and an unanswered catalog request is skipped after **5 seconds**.
 
 ### Live updates with `/reload`
 
@@ -54,6 +54,7 @@ After a successful `/reload`, the server compares the previous and new resource 
 When resources change, the server sends a delta to every connected client that has initialized PackSync and supports the delta channel. The delta contains only added/modified pack entries and the IDs of removed packs, not the entire catalog or unchanged ZIPs.
 
 - New or changed ZIPs are downloaded automatically with the usual progress screen.
+- Live updates stay in the play phase; players already in the world are not moved back into configuration. If the server initially had no packs, the first nonempty update asks permission before downloading.
 - ZIPs already verified during the current connection are reused; unchanged packs are not downloaded again.
 - Priority-only changes reorder the packs without downloading their ZIPs again.
 - Removed packs are deactivated, including when the last resource pack is removed.
@@ -82,6 +83,11 @@ Run automated tests with:
 
 - Server without the mod: normal connection, no download screen or disconnect, and an INFO message.
 - Server with the mod but no resource ZIPs: empty catalog and normal connection.
+- Client without the mod: normal connection to a PackSync server, without an installation task.
+- First connection with packs: prompt appears before world entry; Install downloads and loads before spawning; Disconnect exits without requesting ZIP chunks.
+- Leave the prompt open for more than 30 seconds: it remains usable without a download timeout.
+- Remember + Install: reconnect to the same address without another prompt; a different address still prompts. Without Remember, reconnecting prompts again.
+- Invalid or stalled download during configuration: disconnect without entering the world.
 - Ten datapacks with resources: counter advances from 0/10 to 10/10, progress reaches 100%, and download speed is visible.
 - Two packs overriding the same texture: CRITICAL takes precedence over LOW.
 - Folder-based and ZIP-based datapacks: resources are discovered in both cases.
@@ -98,7 +104,7 @@ Run automated tests with:
 
 Use this version only with **trusted servers and resource packs**. It is not yet hardened for public deployment.
 
-- Downloading and activation are automatic, without a dedicated consent screen.
+- Consent is address-based and covers later updates in that connection. Remembered permissions trust future packs served at the same address; there is no publisher authentication or per-update confirmation after acceptance.
 - SHA-256 verifies transfer integrity, **not the server's identity or trustworthiness**.
 - The mod does not extract ZIP files. Cache filenames are derived from hashes, and chunk sizes and individual pack sizes are bounded. This does not eliminate risks from resources loaded by Minecraft, including ZIP bombs, excessive memory usage, or shaders.
 - There is no global disk quota, automatic cache eviction, server request rate limiting, signing, or thorough resource validation yet.

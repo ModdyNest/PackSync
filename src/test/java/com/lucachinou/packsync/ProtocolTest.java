@@ -7,6 +7,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProtocolTest {
+    @Test void configurationReadyRoundTrip() {
+        var buffer = new FriendlyByteBuf(Unpooled.buffer());
+        try {
+            Protocol.Ready.CODEC.encode(buffer, new Protocol.Ready());
+            assertEquals(new Protocol.Ready(), Protocol.Ready.CODEC.decode(buffer));
+            assertEquals(0, buffer.readableBytes());
+            assertEquals("packsync:ready", Protocol.Ready.TYPE.id().toString());
+        } finally { buffer.release(); }
+    }
     @Test void deltaRoundTrip() {
         var buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
