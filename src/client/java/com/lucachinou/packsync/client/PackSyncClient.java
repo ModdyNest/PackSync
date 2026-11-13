@@ -14,8 +14,14 @@ public class PackSyncClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientConfigurationConnectionEvents.INIT.register((handler, client) ->
-                PackDownload.beginConfiguration(client, () -> ((com.lucachinou.packsync.mixin.client.ClientCommonPacketListenerAccessor) handler)
-                        .packsync$connection().disconnect(Component.literal("Server resource pack installation cancelled or failed"))));
+                PackDownload.beginConfiguration(client, () -> {
+                    var connection = ((com.lucachinou.packsync.mixin.client.ClientCommonPacketListenerAccessor) handler).packsync$connection();
+                    connection.disconnect(Component.literal("Server resource pack installation cancelled or failed"));
+                    // Our consent screen replaces ConnectScreen, which normally processes a
+                    // closed pre-play connection. Run that lifecycle now so onDisconnect
+                    // cleans up PackSync and replaces the prompt with the vanilla screen.
+                    connection.handleDisconnection();
+                }));
         ClientConfigurationConnectionEvents.DISCONNECT.register((handler, client) -> PackDownload.disconnect(client));
         ClientConfigurationNetworking.registerGlobalReceiver(Protocol.Catalog.TYPE,
                 (packet, context) -> PackDownload.configurationCatalog(context.client(), packet));

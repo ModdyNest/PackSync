@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< HEAD
-<testsuite name="com.lucachinou.packsync.PackCatalogTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-10T18:47:50.088Z" hostname="MacBook-Air-de-Lucachinou.local" time="0.016">
-  <properties/>
-  <testcase name="hashesKnownContent()" classname="com.lucachinou.packsync.PackCatalogTest" time="0.011"/>
-  <testcase name="acceptsExactSizeAndRejectsOverflow()" classname="com.lucachinou.packsync.PackCatalogTest" time="0.002"/>
-=======
-<testsuite name="com.lucachinou.packsync.PackCatalogTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-13T17:21:23.131Z" hostname="DESKTOP-1ladm8c" time="0.013">
+<testsuite name="com.lucachinou.packsync.PackCatalogTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-13T19:31:04.465Z" hostname="DESKTOP-1ladm8c" time="0.013">
   <properties/>
   <testcase name="hashesKnownContent()" classname="com.lucachinou.packsync.PackCatalogTest" time="0.008"/>
   <testcase name="acceptsExactSizeAndRejectsOverflow()" classname="com.lucachinou.packsync.PackCatalogTest" time="0.003"/>
->>>>>>> ab6afb3 (Packs are now downloaded in the config phase + New prompt when user join a new server)
   <testcase name="priorityOrderMatchesMinecraftLowToHigh()" classname="com.lucachinou.packsync.PackCatalogTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

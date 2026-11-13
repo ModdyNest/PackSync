@@ -43,7 +43,11 @@ public final class PackDownload {
             return;
         }
         send = ClientPlayNetworking::send;
-        disconnectAction = () -> client.getConnection().getConnection().disconnect(Component.literal("Server resource packs declined"));
+        var connection = client.getConnection().getConnection();
+        disconnectAction = () -> {
+            connection.disconnect(Component.literal("Server resource packs declined"));
+            connection.handleDisconnection();
+        };
         waiting = true; lastActivity = System.nanoTime();
         ClientPlayNetworking.send(new Protocol.Request("", 0));
     }
